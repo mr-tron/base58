@@ -13,7 +13,6 @@ func TestFastEqTrivialEncoding(t *testing.T) {
 			rand.Read(b)
 			if FastBase58Encoding(b) != TrivialBase58Encoding(b) {
 				t.Errorf(hex.EncodeToString(b))
-				return
 			}
 		}
 	}
@@ -23,7 +22,7 @@ func BenchmarkTrivialBase58Encoding(b *testing.B) {
 	data := make([]byte, 32)
 	for i := 0; i < b.N; i++ {
 		rand.Read(data)
-		_ = TrivialBase58Encoding(data)
+		TrivialBase58Encoding(data)
 	}
 }
 
@@ -31,6 +30,6 @@ func BenchmarkFastBase58Encoding(b *testing.B) {
 	data := make([]byte, 32)
 	for i := 0; i < b.N; i++ {
 		rand.Read(data)
-		_ = FastBase58Encoding(data)
+		FastBase58Encoding(data)
 	}
 }

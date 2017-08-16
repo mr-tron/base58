@@ -2,7 +2,12 @@ package main
 
 import "math/big"
 
-const b58digits_ordered string = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+const b58set = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+var (
+	bn0  = big.NewInt(0)
+	bn58 = big.NewInt(58)
+)
 
 func FastBase58Encoding(bin []byte) string {
 	binsz := len(bin)
@@ -16,9 +21,9 @@ func FastBase58Encoding(bin []byte) string {
 	var buf = make([]byte, size)
 
 	high = size - 1
-	for i = zcount; i < binsz; i += 1 {
+	for i = zcount; i < binsz; i++ {
 		j = size - 1
-		for carry = int(bin[i]); j > high || carry != 0; j -= 1 {
+		for carry = int(bin[i]); j > high || carry != 0; j-- {
 			carry = carry + 256*int(buf[j])
 			buf[j] = byte(carry % 58)
 			carry /= 58
@@ -26,7 +31,7 @@ func FastBase58Encoding(bin []byte) string {
 		high = j
 	}
 
-	for j = 0; j < size && buf[j] == 0; j += 1 {
+	for j = 0; j < size && buf[j] == 0; j++ {
 	}
 
 	var b58 = make([]byte, size-j+zcount)
@@ -37,17 +42,13 @@ func FastBase58Encoding(bin []byte) string {
 		}
 	}
 
-	for i = zcount; j < size; i += 1 {
-		b58[i] = b58digits_ordered[buf[j]]
+	for i = zcount; j < size; i++ {
+		b58[i] = b58set[buf[j]]
 		j += 1
 	}
 
 	return string(b58)
 }
-
-var b58set string = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-var bn0 *big.Int = big.NewInt(0)
-var bn58 *big.Int = big.NewInt(58)
 
 func TrivialBase58Encoding(a []byte) string {
 	idx := len(a)*138/100 + 1
