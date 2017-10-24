@@ -36,7 +36,7 @@ func main() {
 
 	// If a base58 string is on the command line, then use that instead of the 4 exampels above.
 	if len(os.Args) > 1 {
-		exampleBase58Encoded = os.Args
+		exampleBase58Encoded = os.Args[1:]
 	}
 
 	for _, vv := range exampleBase58Encoded {
