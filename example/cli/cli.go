@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pschlump/go-base58/base58"
+	"github.com/mr-tron/go-base58/base58"
 )
 
 func main() {

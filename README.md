@@ -4,11 +4,11 @@ Fast implementation of base58 encoding in Go (Golang).
 
 Base algorithm is copied from https://github.com/trezor/trezor-crypto/blob/master/base58.c
 
-To import libarary
+To import library
 
 ```go
 	import (
-		"github.com/pschlump/go-base58/base58"
+		"github.com/mr-tron/go-base58/base58"
 	)
 ```
 
@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pschlump/go-base58/base58"
+	"github.com/mr-tron/go-base58/base58"
 )
 
 func main() {
