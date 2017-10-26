@@ -9,6 +9,8 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+
+	"github.com/pschlump/go-base58/base58"
 )
 
 func checkSum(b []byte) []byte {
@@ -60,7 +62,7 @@ func main() {
 	}
 
 	if *decode {
-		decoded, err := FastBase58Decoding(string(bin))
+		decoded, err := base58.FastBase58Decoding(string(bin))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "decode input err: %v\n", err)
 			os.Exit(1)
@@ -92,7 +94,7 @@ func main() {
 		bin = append(bin, sum[:4]...)
 	}
 
-	encoded := FastBase58Encoding(bin)
+	encoded := base58.FastBase58Encoding(bin)
 
 	if *lnBreak > 0 {
 		lines := (len(encoded) / *lnBreak) + 1

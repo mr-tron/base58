@@ -1,21 +1,3 @@
-# go-base58 A Fast Implementation of Base58 encoding used in Bitcoin
-
-Fast implementation of base58 encoding in Go (Golang). 
-
-Base algorithm is copied from https://github.com/trezor/trezor-crypto/blob/master/base58.c
-
-To import libarary
-
-```go
-	import (
-		"github.com/pschlump/go-base58/base58"
-	)
-```
-
-# Example
-
-```go
-
 package main
 
 import (
@@ -47,11 +29,9 @@ func main() {
 		}
 		chk := base58.FastBase58Encoding(num)
 		if vv == string(chk) {
-			fmt.Printf ( "Successfully decoded then re-encoded %s\n", vv )
+			fmt.Printf("Successfully decoded then re-encoded %s\n", vv)
 		} else {
-			fmt.Printf ( "Failed on %s\n", vv )
+			fmt.Printf("Failed on %s\n", vv)
 		}
 	}
 }
-
-```
