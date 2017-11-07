@@ -1,4 +1,4 @@
-# go-base58 A Fast Implementation of Base58 encoding used in Bitcoin
+# base58 A Fast Implementation of Base58 encoding used in Bitcoin
 
 Fast implementation of base58 encoding in Go (Golang). 
 
@@ -8,7 +8,7 @@ To import library
 
 ```go
 	import (
-		"github.com/mr-tron/go-base58/base58"
+		"github.com/mr-tron/base58/base58"
 	)
 ```
 
@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mr-tron/go-base58/base58"
+	"github.com/mr-tron/base58/base58"
 )
 
 func main() {
