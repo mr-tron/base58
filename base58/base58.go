@@ -23,6 +23,10 @@ var (
 	bn58 = big.NewInt(58)
 )
 
+func Encode(bin []byte) string {
+	return FastBase58Encoding(bin)
+}
+
 func FastBase58Encoding(bin []byte) string {
 	binsz := len(bin)
 	var i, j, high, zcount, carry int
@@ -82,6 +86,10 @@ func TrivialBase58Encoding(a []byte) string {
 		buf[idx] = b58set[0]
 	}
 	return string(buf[idx:])
+}
+
+func Decode(str string) ([]byte, error) {
+	return TrivialBase58Decoding(str)
 }
 
 func FastBase58Decoding(str string) ([]byte, error) {
