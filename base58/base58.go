@@ -7,7 +7,7 @@ import (
 
 const b58set = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 
-var decodeMap [256]int8
+var decodeMap [128]int8
 
 func init() {
 	for i := range decodeMap {
@@ -89,7 +89,7 @@ func TrivialBase58Encoding(a []byte) string {
 }
 
 func Decode(str string) ([]byte, error) {
-	return TrivialBase58Decoding(str)
+	return FastBase58Decoding(str)
 }
 
 func FastBase58Decoding(str string) ([]byte, error) {
@@ -105,10 +105,9 @@ func FastBase58Decoding(str string) ([]byte, error) {
 		b58u  = []rune(str)
 		b58sz = len(b58u)
 
-		binsz     = len(b58u)
-		outisz    = (binsz + 3) / 4 // check to see if we need to change this buffer size to optimize
-		binu      = make([]byte, (binsz+3)*3)
-		bytesleft = binsz % 4
+		outisz    = (b58sz + 3) / 4 // check to see if we need to change this buffer size to optimize
+		binu      = make([]byte, (b58sz+3)*3)
+		bytesleft = b58sz % 4
 	)
 
 	if bytesleft > 0 {
@@ -119,21 +118,19 @@ func FastBase58Decoding(str string) ([]byte, error) {
 
 	var outi = make([]uint32, outisz)
 
-	var i = 0
-	for ; i < b58sz && b58u[i] == '1'; i++ {
+	for  i := 0; i < b58sz && b58u[i] == '1'; i++ {
 		zcount++
 	}
 
-	for ; i < b58sz; i++ {
-		if b58u[i]&0x80 != 0 {
+	for _, r := range b58u{
+		if r > 127{
 			return nil, fmt.Errorf("High-bit set on invalid digit")
 		}
-
-		if decodeMap[b58u[i]] == -1 {
-			return nil, fmt.Errorf("Invalid base58 digit (%q)", b58u[i])
+		if decodeMap[r] == -1 {
+			return nil, fmt.Errorf("Invalid base58 digit (%q)", r)
 		}
 
-		c = uint32(decodeMap[b58u[i]])
+		c = uint32(decodeMap[r])
 
 		for j := (outisz - 1); j >= 0; j-- {
 			t = uint64(outi[j])*58 + uint64(c)
@@ -192,8 +189,7 @@ func FastBase58Decoding(str string) ([]byte, error) {
 			return binu[start:cnt], nil
 		}
 	}
-
-	return binu[:j], nil
+	return binu[:cnt], nil
 }
 
 // Decode decodes the base58 encoded bytes.
