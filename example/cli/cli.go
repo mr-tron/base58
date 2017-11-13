@@ -22,12 +22,12 @@ func main() {
 	}
 
 	for _, vv := range exampleBase58Encoded {
-		num, err := base58.FastBase58Decoding(vv)
+		num, err := base58.Decode(vv)
 		if err != nil {
 			fmt.Printf("Demo %d, got error %s\n", err)
 			continue
 		}
-		chk := base58.FastBase58Encoding(num)
+		chk := base58.Encode(num)
 		if vv == string(chk) {
 			fmt.Printf("Successfully decoded then re-encoded %s\n", vv)
 		} else {
