@@ -118,12 +118,12 @@ func FastBase58Decoding(str string) ([]byte, error) {
 
 	var outi = make([]uint32, outisz)
 
-	for  i := 0; i < b58sz && b58u[i] == '1'; i++ {
+	for i := 0; i < b58sz && b58u[i] == '1'; i++ {
 		zcount++
 	}
 
-	for _, r := range b58u{
-		if r > 127{
+	for _, r := range b58u {
+		if r > 127 {
 			return nil, fmt.Errorf("High-bit set on invalid digit")
 		}
 		if decodeMap[r] == -1 {
