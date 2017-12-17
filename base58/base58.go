@@ -29,6 +29,8 @@ func FastBase58Encoding(bin []byte) string {
 // FastBase58EncodingAlphabet encodes the passed bytes into a base58 encoded
 // string with the passed alphabet.
 func FastBase58EncodingAlphabet(bin []byte, alphabet *Alphabet) string {
+	zero := alphabet.encode[0]
+
 	binsz := len(bin)
 	var i, j, high, zcount, carry int
 
@@ -57,7 +59,7 @@ func FastBase58EncodingAlphabet(bin []byte, alphabet *Alphabet) string {
 
 	if zcount != 0 {
 		for i = 0; i < zcount; i++ {
-			b58[i] = '1'
+			b58[i] = zero
 		}
 	}
 
@@ -78,6 +80,7 @@ func TrivialBase58Encoding(a []byte) string {
 // TrivialBase58EncodingAlphabet encodes the passed bytes into a base58 encoded
 // string (inefficiently) with the passed alphabet.
 func TrivialBase58EncodingAlphabet(a []byte, alphabet *Alphabet) string {
+	zero := alphabet.encode[0]
 	idx := len(a)*138/100 + 1
 	buf := make([]byte, idx)
 	bn := new(big.Int).SetBytes(a)
@@ -92,7 +95,7 @@ func TrivialBase58EncodingAlphabet(a []byte, alphabet *Alphabet) string {
 			break
 		}
 		idx--
-		buf[idx] = alphabet.encode[0]
+		buf[idx] = zero
 	}
 	return string(buf[idx:])
 }
@@ -130,6 +133,8 @@ func FastBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) 
 		outisz    = (b58sz + 3) / 4 // check to see if we need to change this buffer size to optimize
 		binu      = make([]byte, (b58sz+3)*3)
 		bytesleft = b58sz % 4
+
+		zero = rune(alphabet.encode[0])
 	)
 
 	if bytesleft > 0 {
@@ -140,7 +145,7 @@ func FastBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) 
 
 	var outi = make([]uint32, outisz)
 
-	for i := 0; i < b58sz && b58u[i] == '1'; i++ {
+	for i := 0; i < b58sz && b58u[i] == zero; i++ {
 		zcount++
 	}
 
@@ -222,8 +227,10 @@ func TrivialBase58Decoding(str string) ([]byte, error) {
 // TrivialBase58DecodingAlphabet decodes the base58 encoded bytes
 // (inefficiently) using the given b58 alphabet.
 func TrivialBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) {
+	zero := alphabet.encode[0]
+
 	var zcount int
-	for i := 0; i < len(str) && str[i] == '1'; i++ {
+	for i := 0; i < len(str) && str[i] == zero; i++ {
 		zcount++
 	}
 	leading := make([]byte, zcount)
