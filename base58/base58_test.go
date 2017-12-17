@@ -7,7 +7,8 @@ import (
 )
 
 type testValues struct {
-	dec, enc string // decoded hex value
+	dec []byte
+	enc string
 }
 
 var n = 5000000
@@ -21,7 +22,7 @@ func initTestPairs() {
 	data := make([]byte, 32)
 	for i := 0; i < n; i++ {
 		rand.Read(data)
-		testPairs = append(testPairs, testValues{dec: hex.EncodeToString(data), enc: FastBase58Encoding(data)})
+		testPairs = append(testPairs, testValues{dec: data, enc: FastBase58Encoding(data)})
 	}
 }
 
@@ -54,18 +55,20 @@ func TestFastEqTrivialEncodingAndDecoding(t *testing.T) {
 }
 
 func BenchmarkTrivialBase58Encoding(b *testing.B) {
-	data := make([]byte, 32)
+	initTestPairs()
+	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		rand.Read(data)
-		TrivialBase58Encoding(data)
+		TrivialBase58Encoding([]byte(testPairs[i].dec))
 	}
 }
 
 func BenchmarkFastBase58Encoding(b *testing.B) {
-	data := make([]byte, 32)
+	initTestPairs()
+	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		rand.Read(data)
-		FastBase58Encoding(data)
+		FastBase58Encoding(testPairs[i].dec)
 	}
 }
 
