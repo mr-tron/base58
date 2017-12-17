@@ -46,8 +46,11 @@ func TestFastEqTrivialEncodingAndDecoding(t *testing.T) {
 				t.Errorf("trivial error: %v", terr)
 			}
 
-			if hex.EncodeToString(fd) != hex.EncodeToString(td) {
-				t.Errorf("decoding err: [%x] %s != %s", b, hex.EncodeToString(fd), hex.EncodeToString(td))
+			if hex.EncodeToString(b) != hex.EncodeToString(td) {
+				t.Errorf("decoding err: %s != %s", hex.EncodeToString(b), hex.EncodeToString(td))
+			}
+			if hex.EncodeToString(b) != hex.EncodeToString(fd) {
+				t.Errorf("decoding err: %s != %s", hex.EncodeToString(b), hex.EncodeToString(fd))
 			}
 		}
 	}
