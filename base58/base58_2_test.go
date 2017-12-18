@@ -16,7 +16,7 @@ func TestBase58_test2(t *testing.T) {
 		// chk := Base58Encode(num)
 		num, err := FastBase58Decoding(vv)
 		if err != nil {
-			t.Errorf("Test %d, expected success, got error %s\n", err)
+			t.Errorf("Test %d, expected success, got error %s\n", ii, err)
 		}
 		chk := FastBase58Encoding(num)
 		if vv != string(chk) {
