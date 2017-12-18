@@ -29,7 +29,8 @@ func Encode(bin []byte) string {
 
 func FastBase58Encoding(bin []byte) string {
 	binsz := len(bin)
-	var i, j, high, zcount, carry int
+	var i, j, zcount, high int
+	var carry uint32
 
 	for zcount < binsz && bin[zcount] == 0 {
 		zcount++
@@ -41,8 +42,8 @@ func FastBase58Encoding(bin []byte) string {
 	high = size - 1
 	for i = zcount; i < binsz; i++ {
 		j = size - 1
-		for carry = int(bin[i]); j > high || carry != 0; j-- {
-			carry = carry + 256*int(buf[j])
+		for carry = uint32(bin[i]); j > high || carry != 0; j-- {
+			carry = carry + 256*uint32(buf[j])
 			buf[j] = byte(carry % 58)
 			carry /= 58
 		}
@@ -118,12 +119,12 @@ func FastBase58Decoding(str string) ([]byte, error) {
 
 	var outi = make([]uint32, outisz)
 
-	for  i := 0; i < b58sz && b58u[i] == '1'; i++ {
+	for i := 0; i < b58sz && b58u[i] == '1'; i++ {
 		zcount++
 	}
 
-	for _, r := range b58u{
-		if r > 127{
+	for _, r := range b58u {
+		if r > 127 {
 			return nil, fmt.Errorf("High-bit set on invalid digit")
 		}
 		if decodeMap[r] == -1 {
@@ -134,7 +135,7 @@ func FastBase58Decoding(str string) ([]byte, error) {
 
 		for j := (outisz - 1); j >= 0; j-- {
 			t = uint64(outi[j])*58 + uint64(c)
-			c = uint32((t & 0x3f00000000) >> 32)
+			c = uint32(t>>32) & 0x3f
 			outi[j] = uint32(t & 0xffffffff)
 		}
 
