@@ -30,7 +30,7 @@ func Encode(bin []byte) string {
 func FastBase58Encoding(bin []byte) string {
 	binsz := len(bin)
 	var i, j, zcount, high int
-	var carry int32
+	var carry uint32
 
 	for zcount < binsz && bin[zcount] == 0 {
 		zcount++
@@ -42,8 +42,8 @@ func FastBase58Encoding(bin []byte) string {
 	high = size - 1
 	for i = zcount; i < binsz; i++ {
 		j = size - 1
-		for carry = int32(bin[i]); j > high || carry != 0; j-- {
-			carry = carry + 256*int32(buf[j])
+		for carry = uint32(bin[i]); j > high || carry != 0; j-- {
+			carry = carry + 256*uint32(buf[j])
 			buf[j] = byte(carry % 58)
 			carry /= 58
 		}
