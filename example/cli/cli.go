@@ -24,7 +24,7 @@ func main() {
 	for _, vv := range exampleBase58Encoded {
 		num, err := base58.Decode(vv)
 		if err != nil {
-			fmt.Printf("Demo %d, got error %s\n", vv, err)
+			fmt.Printf("Demo %s, got error %s\n", vv, err)
 			continue
 		}
 		chk := base58.Encode(num)
