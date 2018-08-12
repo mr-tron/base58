@@ -5,7 +5,21 @@ Fast implementation of base58 encoding in Go (Golang).
 
 Base algorithm is copied from https://github.com/trezor/trezor-crypto/blob/master/base58.c
 
-To import library
+## Benchmark
+Trivial - encoding via big.Int (over libraries use this implemenation)
+Fast - optimized algorythm from trezor
+
+```
+BenchmarkTrivialBase58Encoding-4   	  200000	     10602 ns/op  
+BenchmarkFastBase58Encoding-4      	 1000000	      1637 ns/op
+BenchmarkTrivialBase58Decoding-4   	  200000	      8316 ns/op
+BenchmarkFastBase58Decoding-4      	 1000000	      1045 ns/op
+```
+Encoding - **faster by 6 times**
+
+Decoding - **faster by 8 times**
+
+## Usage
 
 ```go
 	import (
@@ -13,7 +27,7 @@ To import library
 	)
 ```
 
-# Example
+## Example
 
 ```go
 
