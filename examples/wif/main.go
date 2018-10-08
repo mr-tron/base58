@@ -1,4 +1,4 @@
-package wif
+package main
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/mr-tron/base58/base58"
+	"github.com/mr-tron/base58"
 )
 
 func checkSum(b []byte) []byte {
@@ -44,27 +44,27 @@ func main() {
 	fin, fout := os.Stdin, os.Stdout
 	if *input != "-" {
 		if fin, err = os.Open(*input); err != nil {
-			println("input file err:", err)
+			fmt.Fprintln(os.Stderr, "input file err:", err)
 			os.Exit(1)
 		}
 	}
 
 	if *output != "-" {
 		if fout, err = os.Create(*output); err != nil {
-			println("output file err:", err)
+			fmt.Fprintln(os.Stderr, "output file err:", err)
 			os.Exit(1)
 		}
 	}
 
 	if bin, err = ioutil.ReadAll(fin); err != nil {
-		println("read input err:", err)
+		fmt.Fprintln(os.Stderr, "read input err:", err)
 		os.Exit(1)
 	}
 
 	if *decode {
 		decoded, err := base58.Decode(string(bin))
 		if err != nil {
-			println("decode input err:", err)
+			fmt.Fprintln(os.Stderr, "decode input err:", err)
 			os.Exit(1)
 		}
 
@@ -79,13 +79,13 @@ func main() {
 
 		_, err = io.Copy(fout, bytes.NewReader(decoded))
 		if err != nil {
-			println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
 		if *check && !checkResult {
 			if *useError {
-				fmt.Fprintf(os.Stderr, "%t", false)
+				fmt.Fprintf(os.Stderr, "%t\n", false)
 			}
 			os.Exit(3)
 		}
