@@ -44,27 +44,27 @@ func main() {
 	fin, fout := os.Stdin, os.Stdout
 	if *input != "-" {
 		if fin, err = os.Open(*input); err != nil {
-			fmt.Fprintf(os.Stderr, "input file err: %v\n", err)
+			println("input file err:", err)
 			os.Exit(1)
 		}
 	}
 
 	if *output != "-" {
 		if fout, err = os.Create(*output); err != nil {
-			fmt.Fprintf(os.Stderr, "output file err: %v\n", err)
+			println("output file err:", err)
 			os.Exit(1)
 		}
 	}
 
 	if bin, err = ioutil.ReadAll(fin); err != nil {
-		fmt.Fprintf(os.Stderr, "read input err: %v\n", err)
+		println("read input err:", err)
 		os.Exit(1)
 	}
 
 	if *decode {
-		decoded, err := base58.FastBase58Decoding(string(bin))
+		decoded, err := base58.Decode(string(bin))
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "decode input err: %v\n", err)
+			println("decode input err:", err)
 			os.Exit(1)
 		}
 
@@ -77,7 +77,11 @@ func main() {
 			checkResult = hex.EncodeToString(sum[:4]) == hex.EncodeToString(decodedCk)
 		}
 
-		io.Copy(fout, bytes.NewReader(decoded))
+		_, err = io.Copy(fout, bytes.NewReader(decoded))
+		if err != nil {
+			println(err)
+			os.Exit(1)
+		}
 
 		if *check && !checkResult {
 			if *useError {
@@ -94,7 +98,7 @@ func main() {
 		bin = append(bin, sum[:4]...)
 	}
 
-	encoded := base58.FastBase58Encoding(bin)
+	encoded := base58.Encode(bin)
 
 	if *lnBreak > 0 {
 		lines := (len(encoded) / *lnBreak) + 1
