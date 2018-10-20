@@ -89,22 +89,22 @@ func FastBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) 
 	}
 
 	var (
-		t        uint64
-		zmask, c uint32
-		zcount   int
+		t, c   uint64
+		zmask  uint32
+		zcount int
 
 		b58u  = []rune(str)
 		b58sz = len(b58u)
 
-		outisz    = (b58sz + 3) / 4 // check to see if we need to change this buffer size to optimize
+		outisz    = (b58sz + 3) >> 2
 		binu      = make([]byte, (b58sz+3)*3)
-		bytesleft = b58sz % 4
+		bytesleft = b58sz & 3
 
 		zero = rune(alphabet.encode[0])
 	)
 
 	if bytesleft > 0 {
-		zmask = (0xffffffff << uint32(bytesleft*8))
+		zmask = 0xffffffff << uint32(bytesleft*8)
 	} else {
 		bytesleft = 4
 	}
@@ -117,26 +117,26 @@ func FastBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) 
 
 	for _, r := range b58u {
 		if r > 127 {
-			return nil, fmt.Errorf("High-bit set on invalid digit")
+			return nil, fmt.Errorf("high-bit set on invalid digit")
 		}
 		if alphabet.decode[r] == -1 {
-			return nil, fmt.Errorf("Invalid base58 digit (%q)", r)
+			return nil, fmt.Errorf("invalid base58 digit (%q)", r)
 		}
 
-		c = uint32(alphabet.decode[r])
+		c = uint64(alphabet.decode[r])
 
-		for j := (outisz - 1); j >= 0; j-- {
-			t = uint64(outi[j])*58 + uint64(c)
-			c = uint32(t>>32) & 0x3f
+		for j := outisz - 1; j >= 0; j-- {
+			t = uint64(outi[j])*58 + c
+			c = (t >> 32) & 0x3f
 			outi[j] = uint32(t & 0xffffffff)
 		}
 
 		if c > 0 {
-			return nil, fmt.Errorf("Output number too big (carry to the next int32)")
+			return nil, fmt.Errorf("output number too big (carry to the next int32)")
 		}
 
 		if outi[0]&zmask != 0 {
-			return nil, fmt.Errorf("Output number too big (last int32 filled too far)")
+			return nil, fmt.Errorf("output number too big (last int32 filled too far)")
 		}
 	}
 
