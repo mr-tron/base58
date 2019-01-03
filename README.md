@@ -1,5 +1,5 @@
 # Fast Implementation of Base58 encoding
-[![GoDoc](https://godoc.org/github.com/mr-tron/base58/base58?status.svg)](https://godoc.org/github.com/mr-tron/base58/base58)  [![Go Report Card](https://goreportcard.com/badge/github.com/mr-tron/base58)](https://goreportcard.com/report/github.com/mr-tron/base58)
+[![GoDoc](https://godoc.org/github.com/mr-tron/base58?status.svg)](https://godoc.org/github.com/mr-tron/base58)  [![Go Report Card](https://goreportcard.com/badge/github.com/mr-tron/base58)](https://goreportcard.com/report/github.com/mr-tron/base58)
 [![Used By](https://sourcegraph.com/github.com/mr-tron/base58/-/badge.svg)](https://sourcegraph.com/github.com/mr-tron/base58?badge)
 
 Fast implementation of base58 encoding in Go. 
