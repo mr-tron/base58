@@ -19,8 +19,8 @@ func initTestPairs() {
 		return
 	}
 	// pre-make the test pairs, so it doesn't take up benchmark time...
-	data := make([]byte, 32)
 	for i := 0; i < n; i++ {
+		data := make([]byte, 32)
 		rand.Read(data)
 		testPairs = append(testPairs, testValues{dec: data, enc: FastBase58Encoding(data)})
 	}
