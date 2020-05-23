@@ -23,53 +23,52 @@ func FastBase58Encoding(bin []byte) string {
 // FastBase58EncodingAlphabet encodes the passed bytes into a base58 encoded
 // string with the passed alphabet.
 func FastBase58EncodingAlphabet(bin []byte, alphabet *Alphabet) string {
-	zero := alphabet.encode[0]
 
-	binsz := len(bin)
-	var i, j, zcount, high int
-	var carry uint32
+	size := len(bin)
 
-	for zcount < binsz && bin[zcount] == 0 {
+	zcount := 0
+	for zcount < size && bin[zcount] == 0 {
 		zcount++
 	}
 
-	size := ((binsz-zcount)*138/100 + 1)
+	// It is crucial to make this as short as possible, especially for
+	// the usual case of bitcoin addrs
+	size = zcount +
+		// This is an integer simplification of
+		// ceil(log(256)/log(58))
+		(size-zcount)*555/406 + 1
 
-	// allocate one big buffer up front
-	buf := make([]byte, size*2+zcount)
+	out := make([]byte, size)
 
-	// use the second half for the temporary buffer
-	tmp := buf[size+zcount:]
+	var i, high int
+	var carry uint32
 
 	high = size - 1
-	for i = zcount; i < binsz; i++ {
-		j = size - 1
-		for carry = uint32(bin[i]); j > high || carry != 0; j-- {
-			carry = carry + 256*uint32(tmp[j])
-			tmp[j] = byte(carry % 58)
+	for _, b := range bin {
+		i = size - 1
+		for carry = uint32(b); i > high || carry != 0; i-- {
+			carry = carry + 256*uint32(out[i])
+			out[i] = byte(carry % 58)
 			carry /= 58
 		}
-		high = j
+		high = i
 	}
 
-	for j = 0; j < size && tmp[j] == 0; j++ {
+	for i = 0; i < size && out[i] == 0; i++ {
 	}
 
 	// Use the first half for the result
-	b58 := buf[:size-j+zcount]
-
-	if zcount != 0 {
-		for i = 0; i < zcount; i++ {
-			b58[i] = zero
+	val := out[i-zcount:]
+	size = len(val)
+	for i = 0; i < size; i++ {
+		if i < zcount {
+			out[i] = alphabet.encode[0]
+		} else {
+			out[i] = alphabet.encode[val[i]]
 		}
 	}
 
-	for i = zcount; j < size; i++ {
-		b58[i] = alphabet.encode[tmp[j]]
-		j++
-	}
-
-	return string(b58)
+	return string(out[:size])
 }
 
 // Decode decodes the base58 encoded bytes.
