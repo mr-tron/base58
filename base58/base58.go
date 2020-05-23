@@ -3,27 +3,76 @@ package base58
 import (
 	"fmt"
 	"math/big"
+
+	b58ng "github.com/mr-tron/base58"
 )
+
+// Encode encodes the passed bytes into a base58 encoded string.
+var Encode = b58ng.Encode
+
+// FastBase58Encoding encodes the passed bytes into a base58 encoded string.
+var FastBase58Encoding = b58ng.FastBase58Encoding
+
+// TrivialBase58Encoding encodes the passed bytes into a base58 encoded string
+// (inefficiently).
+var TrivialBase58Encoding = b58ng.TrivialBase58Encoding
+
+// Decode decodes the base58 encoded bytes.
+var Decode = b58ng.Decode
+
+// FastBase58Decoding decodes the base58 encoded bytes.
+var FastBase58Decoding = b58ng.FastBase58Decoding
+
+// TrivialBase58Decoding decodes the base58 encoded bytes (inefficiently).
+var TrivialBase58Decoding = b58ng.TrivialBase58Decoding
+
+///////////////////////////////////////////////////////////////////////////
+/*
+
+EVERYTHING FROM THIS POINT DOWN IS FROZEN IN TIME AND NOT RECEIVING UPDATES
+
+*/
+///////////////////////////////////////////////////////////////////////////
 
 var (
 	bn0  = big.NewInt(0)
 	bn58 = big.NewInt(58)
 )
 
-// Encode encodes the passed bytes into a base58 encoded string.
-func Encode(bin []byte) string {
-	return FastBase58Encoding(bin)
+// Alphabet is a a b58 alphabet.
+type Alphabet struct {
+	decode [128]int8
+	encode [58]byte
 }
+
+// NewAlphabet creates a new alphabet from the passed string.
+//
+// It panics if the passed string is not 58 bytes long or isn't valid ASCII.
+func NewAlphabet(s string) *Alphabet {
+	if len(s) != 58 {
+		panic("base58 alphabets must be 58 bytes long")
+	}
+	ret := new(Alphabet)
+	copy(ret.encode[:], s)
+	for i := range ret.decode {
+		ret.decode[i] = -1
+	}
+	for i, b := range ret.encode {
+		ret.decode[b] = int8(i)
+	}
+	return ret
+}
+
+// BTCAlphabet is the bitcoin base58 alphabet.
+var BTCAlphabet = NewAlphabet("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
+
+// FlickrAlphabet is the flickr base58 alphabet.
+var FlickrAlphabet = NewAlphabet("123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ")
 
 // EncodeAlphabet encodes the passed bytes into a base58 encoded string with the
 // passed alphabet.
 func EncodeAlphabet(bin []byte, alphabet *Alphabet) string {
 	return FastBase58EncodingAlphabet(bin, alphabet)
-}
-
-// FastBase58Encoding encodes the passed bytes into a base58 encoded string.
-func FastBase58Encoding(bin []byte) string {
-	return FastBase58EncodingAlphabet(bin, BTCAlphabet)
 }
 
 // FastBase58EncodingAlphabet encodes the passed bytes into a base58 encoded
@@ -78,12 +127,6 @@ func FastBase58EncodingAlphabet(bin []byte, alphabet *Alphabet) string {
 	return string(b58)
 }
 
-// TrivialBase58Encoding encodes the passed bytes into a base58 encoded string
-// (inefficiently).
-func TrivialBase58Encoding(a []byte) string {
-	return TrivialBase58EncodingAlphabet(a, BTCAlphabet)
-}
-
 // TrivialBase58EncodingAlphabet encodes the passed bytes into a base58 encoded
 // string (inefficiently) with the passed alphabet.
 func TrivialBase58EncodingAlphabet(a []byte, alphabet *Alphabet) string {
@@ -107,19 +150,9 @@ func TrivialBase58EncodingAlphabet(a []byte, alphabet *Alphabet) string {
 	return string(buf[idx:])
 }
 
-// Decode decodes the base58 encoded bytes.
-func Decode(str string) ([]byte, error) {
-	return FastBase58Decoding(str)
-}
-
 // DecodeAlphabet decodes the base58 encoded bytes using the given b58 alphabet.
 func DecodeAlphabet(str string, alphabet *Alphabet) ([]byte, error) {
 	return FastBase58DecodingAlphabet(str, alphabet)
-}
-
-// FastBase58Decoding decodes the base58 encoded bytes.
-func FastBase58Decoding(str string) ([]byte, error) {
-	return FastBase58DecodingAlphabet(str, BTCAlphabet)
 }
 
 // FastBase58DecodingAlphabet decodes the base58 encoded bytes using the given
@@ -224,11 +257,6 @@ func FastBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) 
 		}
 	}
 	return binu[:cnt], nil
-}
-
-// TrivialBase58Decoding decodes the base58 encoded bytes (inefficiently).
-func TrivialBase58Decoding(str string) ([]byte, error) {
-	return TrivialBase58DecodingAlphabet(str, BTCAlphabet)
 }
 
 // TrivialBase58DecodingAlphabet decodes the base58 encoded bytes
