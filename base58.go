@@ -104,8 +104,9 @@ func FastBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) 
 
 	var t, c uint64
 
+	// the 32bit algo stretches the result up to 2 times
+	binu := make([]byte, 2*((b58sz*406/555)+1))
 	outi := make([]uint32, (b58sz+3)/4)
-	binu := make([]byte, (b58sz+3)*3)
 
 	for _, r := range str {
 		if r > 127 {
