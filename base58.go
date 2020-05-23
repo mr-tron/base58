@@ -61,11 +61,7 @@ func FastBase58EncodingAlphabet(bin []byte, alphabet *Alphabet) string {
 	val := out[i-zcount:]
 	size = len(val)
 	for i = 0; i < size; i++ {
-		if i < zcount {
-			out[i] = alphabet.encode[0]
-		} else {
-			out[i] = alphabet.encode[val[i]]
-		}
+		out[i] = alphabet.encode[val[i]]
 	}
 
 	return string(out[:size])
