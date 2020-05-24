@@ -54,10 +54,11 @@ func FastBase58EncodingAlphabet(bin []byte, alphabet *Alphabet) string {
 		high = i
 	}
 
-	for i = 0; i < size && out[i] == 0; i++ {
+	// Determine the additional "zero-gap" in the buffer (aside from zcount)
+	for i = zcount; i < size && out[i] == 0; i++ {
 	}
 
-	// Use the first half for the result
+	// Now encode the values with actual alphabet in-place
 	val := out[i-zcount:]
 	size = len(val)
 	for i = 0; i < size; i++ {
