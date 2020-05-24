@@ -131,20 +131,24 @@ func FastBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) 
 		mask = 32
 	}
 	mask -= 8
-	var j, cnt int
-	for j, cnt = 0, 0; j < len(outi); j++ {
+
+	outLen := 0
+	for j := 0; j < len(outi); j++ {
 		for mask < 32 { // loop relies on uint overflow
-			binu[cnt] = byte(outi[j] >> mask)
+			binu[outLen] = byte(outi[j] >> mask)
 			mask -= 8
-			cnt++
+			outLen++
 		}
 		mask = 24
 	}
 
-	for n := zcount; n < len(binu); n++ {
-		if binu[n] > 0 {
-			return binu[n-zcount : cnt], nil
+	// find the most significant byte post-decode, if any
+	for msb := zcount; msb < len(binu); msb++ {
+		if binu[msb] > 0 {
+			return binu[msb-zcount : outLen], nil
 		}
 	}
-	return binu[:cnt], nil
+
+	// it's all zeroes
+	return binu[:outLen], nil
 }
