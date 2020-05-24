@@ -120,7 +120,7 @@ func FastBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) 
 
 		for j := len(outi) - 1; j >= 0; j-- {
 			t = uint64(outi[j])*58 + c
-			c = (t >> 32) & 0x3f
+			c = t >> 32
 			outi[j] = uint32(t & 0xffffffff)
 		}
 	}
