@@ -1,8 +1,8 @@
 package base58
 
 import (
-	"crypto/rand"
 	"encoding/hex"
+	"math/rand"
 	"testing"
 )
 
