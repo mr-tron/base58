@@ -11,14 +11,15 @@ Trivial - encoding via big.Int (over libraries use this implemenation)
 Fast - optimized algorythm from trezor
 
 ```
-BenchmarkTrivialBase58Encoding-4   	  200000	     10602 ns/op  
-BenchmarkFastBase58Encoding-4      	 1000000	      1637 ns/op
-BenchmarkTrivialBase58Decoding-4   	  200000	      8316 ns/op
-BenchmarkFastBase58Decoding-4      	 1000000	      1045 ns/op
+BenchmarkTrivialBase58Encoding-4          123063              9568 ns/op
+BenchmarkFastBase58Encoding-4             690040              1598 ns/op
+
+BenchmarkTrivialBase58Decoding-4          275216              4301 ns/op
+BenchmarkFastBase58Decoding-4            1812105               658 ns/op
 ```
 Encoding - **faster by 6 times**
 
-Decoding - **faster by 8 times**
+Decoding - **faster by 6 times**
 
 ## Usage example
 
