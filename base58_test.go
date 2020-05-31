@@ -47,6 +47,48 @@ func randAlphabet() *Alphabet {
 	return NewAlphabet(string(bts[:58]))
 }
 
+var btcDigits = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+func TestInvalidAlphabetTooShort(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic on alphabet being too short did not occur")
+		}
+	}()
+
+	_ = NewAlphabet(btcDigits[1:])
+}
+
+func TestInvalidAlphabetTooLong(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic on alphabet being too long did not occur")
+		}
+	}()
+
+	_ = NewAlphabet("0" + btcDigits)
+}
+
+func TestInvalidAlphabetNon127(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic on alphabet containing non-ascii chars did not occur")
+		}
+	}()
+
+	_ = NewAlphabet("\xFF" + btcDigits[1:])
+}
+
+func TestInvalidAlphabetDup(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic on alphabet containing duplicate chars did not occur")
+		}
+	}()
+
+	_ = NewAlphabet("z" + btcDigits[1:])
+}
+
 func TestFastEqTrivialEncodingAndDecoding(t *testing.T) {
 	for k := 0; k < 10; k++ {
 		testEncDecLoop(t, randAlphabet())
