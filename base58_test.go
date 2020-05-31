@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 type testValues struct {
@@ -13,6 +14,12 @@ type testValues struct {
 
 var n = 5000000
 var testPairs = make([]testValues, 0, n)
+
+func init() {
+	// If we do not seed the prng - it will default to a seed of (1)
+	// https://golang.org/pkg/math/rand/#Seed
+	rand.Seed(time.Now().UTC().UnixNano())
+}
 
 func initTestPairs() {
 	if len(testPairs) > 0 {
@@ -28,7 +35,6 @@ func initTestPairs() {
 
 func randAlphabet() *Alphabet {
 	// Permutes [0, 127] and returns the first 58 elements.
-	// Like (math/rand).Perm but using crypto/rand.
 	var randomness [128]byte
 	rand.Read(randomness[:])
 
