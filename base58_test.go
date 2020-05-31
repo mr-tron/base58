@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 type testValues struct {
@@ -13,6 +14,12 @@ type testValues struct {
 
 var n = 5000000
 var testPairs = make([]testValues, 0, n)
+
+func init() {
+	// If we do not seed the prng - it will default to a seed of (1)
+	// https://golang.org/pkg/math/rand/#Seed
+	rand.Seed(time.Now().UTC().UnixNano())
+}
 
 func initTestPairs() {
 	if len(testPairs) > 0 {
@@ -28,7 +35,6 @@ func initTestPairs() {
 
 func randAlphabet() *Alphabet {
 	// Permutes [0, 127] and returns the first 58 elements.
-	// Like (math/rand).Perm but using crypto/rand.
 	var randomness [128]byte
 	rand.Read(randomness[:])
 
@@ -39,6 +45,48 @@ func randAlphabet() *Alphabet {
 		bts[j] = byte(i)
 	}
 	return NewAlphabet(string(bts[:58]))
+}
+
+var btcDigits = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+func TestInvalidAlphabetTooShort(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic on alphabet being too short did not occur")
+		}
+	}()
+
+	_ = NewAlphabet(btcDigits[1:])
+}
+
+func TestInvalidAlphabetTooLong(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic on alphabet being too long did not occur")
+		}
+	}()
+
+	_ = NewAlphabet("0" + btcDigits)
+}
+
+func TestInvalidAlphabetNon127(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic on alphabet containing non-ascii chars did not occur")
+		}
+	}()
+
+	_ = NewAlphabet("\xFF" + btcDigits[1:])
+}
+
+func TestInvalidAlphabetDup(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic on alphabet containing duplicate chars did not occur")
+		}
+	}()
+
+	_ = NewAlphabet("z" + btcDigits[1:])
 }
 
 func TestFastEqTrivialEncodingAndDecoding(t *testing.T) {
