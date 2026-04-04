@@ -14,6 +14,7 @@ type testValues struct {
 
 var n = 5000000
 var testPairs = make([]testValues, 0, n)
+var testPairsByLength = make(map[int][]testValues)
 
 func init() {
 	// If we do not seed the prng - it will default to a seed of (1)
@@ -25,12 +26,24 @@ func initTestPairs() {
 	if len(testPairs) > 0 {
 		return
 	}
-	// pre-make the test pairs, so it doesn't take up benchmark time...
-	for i := 0; i < n; i++ {
-		data := make([]byte, 32)
-		rand.Read(data)
-		testPairs = append(testPairs, testValues{dec: data, enc: FastBase58Encoding(data)})
+	testPairs = initTestPairsWithSize(32)
+}
+
+func initTestPairsWithSize(size int) []testValues {
+	if pairs, ok := testPairsByLength[size]; ok && len(pairs) > 0 {
+		return pairs
 	}
+
+	// pre-make the test pairs, so it doesn't take up benchmark time...
+	pairs := make([]testValues, 0, n)
+	for i := 0; i < n; i++ {
+		data := make([]byte, size)
+		rand.Read(data)
+		pairs = append(pairs, testValues{dec: data, enc: FastBase58Encoding(data)})
+	}
+
+	testPairsByLength[size] = pairs
+	return pairs
 }
 
 func randAlphabet() *Alphabet {
@@ -129,37 +142,117 @@ func testEncDecLoop(t *testing.T, alph *Alphabet) {
 }
 
 func BenchmarkTrivialBase58Encoding(b *testing.B) {
-	initTestPairs()
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		TrivialBase58Encoding([]byte(testPairs[i].dec))
-	}
+	benchmarkTrivialBase58EncodingWithSize(b, 32)
 }
 
 func BenchmarkFastBase58Encoding(b *testing.B) {
-	initTestPairs()
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		FastBase58Encoding(testPairs[i].dec)
-	}
+	benchmarkFastBase58EncodingWithSize(b, 32)
 }
 
 func BenchmarkTrivialBase58Decoding(b *testing.B) {
-	initTestPairs()
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		TrivialBase58Decoding(testPairs[i].enc)
-	}
+	benchmarkTrivialBase58DecodingWithSize(b, 32)
 }
 
 func BenchmarkFastBase58Decoding(b *testing.B) {
-	initTestPairs()
+	benchmarkFastBase58DecodingWithSize(b, 32)
+}
+
+func BenchmarkTrivialBase58Encoding32(b *testing.B) {
+	benchmarkTrivialBase58EncodingWithSize(b, 32)
+}
+
+func BenchmarkFastBase58Encoding32(b *testing.B) {
+	benchmarkFastBase58EncodingWithSize(b, 32)
+}
+
+func BenchmarkTrivialBase58Encoding36(b *testing.B) {
+	benchmarkTrivialBase58EncodingWithSize(b, 36)
+}
+
+func BenchmarkFastBase58Encoding36(b *testing.B) {
+	benchmarkFastBase58EncodingWithSize(b, 36)
+}
+
+func BenchmarkTrivialBase58Encoding64(b *testing.B) {
+	benchmarkTrivialBase58EncodingWithSize(b, 64)
+}
+
+func BenchmarkFastBase58Encoding64(b *testing.B) {
+	benchmarkFastBase58EncodingWithSize(b, 64)
+}
+
+func BenchmarkTrivialBase58Encoding256(b *testing.B) {
+	benchmarkTrivialBase58EncodingWithSize(b, 256)
+}
+
+func BenchmarkFastBase58Encoding256(b *testing.B) {
+	benchmarkFastBase58EncodingWithSize(b, 256)
+}
+
+func BenchmarkTrivialBase58Decoding32(b *testing.B) {
+	benchmarkTrivialBase58DecodingWithSize(b, 32)
+}
+
+func BenchmarkFastBase58Decoding32(b *testing.B) {
+	benchmarkFastBase58DecodingWithSize(b, 32)
+}
+
+func BenchmarkTrivialBase58Decoding36(b *testing.B) {
+	benchmarkTrivialBase58DecodingWithSize(b, 36)
+}
+
+func BenchmarkFastBase58Decoding36(b *testing.B) {
+	benchmarkFastBase58DecodingWithSize(b, 36)
+}
+
+func BenchmarkTrivialBase58Decoding64(b *testing.B) {
+	benchmarkTrivialBase58DecodingWithSize(b, 64)
+}
+
+func BenchmarkFastBase58Decoding64(b *testing.B) {
+	benchmarkFastBase58DecodingWithSize(b, 64)
+}
+
+func BenchmarkTrivialBase58Decoding256(b *testing.B) {
+	benchmarkTrivialBase58DecodingWithSize(b, 256)
+}
+
+func BenchmarkFastBase58Decoding256(b *testing.B) {
+	benchmarkFastBase58DecodingWithSize(b, 256)
+}
+
+func benchmarkTrivialBase58EncodingWithSize(b *testing.B, size int) {
+	pairs := initTestPairsWithSize(size)
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		FastBase58Decoding(testPairs[i].enc)
+		TrivialBase58Encoding(pairs[i%len(pairs)].dec)
+	}
+}
+
+func benchmarkFastBase58EncodingWithSize(b *testing.B, size int) {
+	pairs := initTestPairsWithSize(size)
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		FastBase58Encoding(pairs[i%len(pairs)].dec)
+	}
+}
+
+func benchmarkTrivialBase58DecodingWithSize(b *testing.B, size int) {
+	pairs := initTestPairsWithSize(size)
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		TrivialBase58Decoding(pairs[i%len(pairs)].enc)
+	}
+}
+
+func benchmarkFastBase58DecodingWithSize(b *testing.B, size int) {
+	pairs := initTestPairsWithSize(size)
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		FastBase58Decoding(pairs[i%len(pairs)].enc)
 	}
 }
