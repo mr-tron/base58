@@ -17,6 +17,13 @@ BenchmarkFastBase58Encoding-10          	 6090552	       193.7 ns/op
 
 BenchmarkTrivialBase58Decoding-10       	 1539550	       767.5 ns/op
 BenchmarkFastBase58Decoding-10          	18001034	        64.68 ns/op
+
+cpu: AMD Ryzen 7 PRO 4750U
+BenchmarkTrivialBase58Encoding-16                 239527              5149 ns/op
+BenchmarkFastBase58Encoding-16                   5029388               252.6 ns/op
+
+BenchmarkTrivialBase58Decoding-16                 880732              1434 ns/op
+BenchmarkFastBase58Decoding-16                   9524245               151.9 ns/op
 ```
 Encoding - **faster by 8 times**
 
