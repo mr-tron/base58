@@ -246,25 +246,30 @@ func TrivialBase58Decoding(str string) ([]byte, error) {
 // (inefficiently) using the given b58 alphabet.
 // Deprecated: use github.com/mr-tron/base58.FastBase58DecodingAlphabet instead.
 func TrivialBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, error) {
+	if len(str) == 0 {
+		return nil, fmt.Errorf("zero length string")
+	}
+
 	zero := alphabet.encode[0]
 
 	var zcount int
 	for i := 0; i < len(str) && str[i] == zero; i++ {
 		zcount++
 	}
+	if zcount == len(str) {
+		return make([]byte, zcount), nil
+	}
 	leading := make([]byte, zcount)
 
-	var padChar rune = -1
-	src := []byte(str)
-	j := 0
-	for ; j < len(src) && src[j] == byte(padChar); j++ {
-	}
-
 	n := new(big.Int)
-	for i := range src[j:] {
-		c := alphabet.decode[src[i]]
+	for i := zcount; i < len(str); i++ {
+		ch := str[i]
+		if ch > 127 {
+			return nil, fmt.Errorf("high-bit set on invalid digit")
+		}
+		c := alphabet.decode[ch]
 		if c == -1 {
-			return nil, fmt.Errorf("illegal base58 data at input index: %d", i)
+			return nil, fmt.Errorf("invalid base58 digit (%q)", ch)
 		}
 		n.Mul(n, bn58)
 		n.Add(n, big.NewInt(int64(c)))
