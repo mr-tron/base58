@@ -254,20 +254,14 @@ func TrivialBase58DecodingAlphabet(str string, alphabet *Alphabet) ([]byte, erro
 	}
 	leading := make([]byte, zcount)
 
-	var padChar rune = -1
-	src := []byte(str)
-	j := 0
-	for ; j < len(src) && src[j] == byte(padChar); j++ {
-	}
-
 	n := new(big.Int)
-	for i := range src[j:] {
-		c := alphabet.decode[src[i]]
-		if c == -1 {
+	for i := zcount; i < len(str); i++ {
+		ch := str[i]
+		if int(ch) >= len(alphabet.decode) || alphabet.decode[ch] == -1 {
 			return nil, fmt.Errorf("illegal base58 data at input index: %d", i)
 		}
 		n.Mul(n, bn58)
-		n.Add(n, big.NewInt(int64(c)))
+		n.Add(n, big.NewInt(int64(alphabet.decode[ch])))
 	}
 	return append(leading, n.Bytes()...), nil
 }
